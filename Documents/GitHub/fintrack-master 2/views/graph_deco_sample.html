@@ -1,0 +1,201 @@
+
+<!DOCTYPE html><html lang='en' class=''>
+<head><script src='//static.codepen.io/assets/editor/live/console_runner-ce3034e6bde3912cc25f83cccb7caa2b0f976196f2f2d52303a462c826d54a73.js'></script><script src='//static.codepen.io/assets/editor/live/css_reload-2a5c7ad0fe826f66e054c6020c99c1e1c63210256b6ba07eb41d7a4cb0d0adab.js'></script><meta charset='UTF-8'><meta name="robots" content="noindex"><link rel="shortcut icon" type="image/x-icon" href="//static.codepen.io/assets/favicon/favicon-8ea04875e70c4b0bb41da869e81236e54394d63638a1ef12fa558a4a835f1164.ico" /><link rel="mask-icon" type="" href="//static.codepen.io/assets/favicon/logo-pin-f2d2b6d2c61838f7e76325261b7195c27224080bc099486ddd6dccb469b8e8e6.svg" color="#111" /><link rel="canonical" href="https://codepen.io/mikebucks/pen/RgdYQb" />
+
+
+<style class="cp-pen-styles">body { margin: 0; padding: 0; font-family: Helvetica, Arial, sans-serif; font-size: 12px; color: rgba(255, 255, 255, .7); }
+
+.chart-container { padding: 20px; background: #181818 url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/687/bg-tile-stipes.png") 0 0 repeat; }
+
+.chart-legend { padding: 0; margin: 0; list-style: none; margin: 20px 0 0 0; text-align: center; }
+.chart-legend li { display: inline-block; margin: 0 10px; line-height: 15px; }
+.chart-legend li::before { content: ''; float: left; width: 10px; height: 10px; margin-right: 7px; border: solid 2px #6fb32a; border-radius: 50%; }
+.chart-legend li.min-bid::before,
+.chart-legend li.max-bid::before { border-color: transparent; background: #6fb32a; opacity: .3; }
+.chart-legend li.max-bid::before { opacity: .6 }
+.chart-legend li.sku-one::before,
+.chart-legend li.sku-two::before,
+.chart-legend li.sku-three::before{ border-color: transparent; background: #6fb32a; opacity: 1; }
+.chart-legend li.sku-two::before { background: blue; }
+.chart-legend li.sku-three::before { background: red; }
+
+.tool-tip { float: right; height: 20px; backface-visibility: hidden; color: #6fb32a; transform: rotateX(180deg); transition: transform .3s ease-in; }
+.tool-tip.active { transform: rotateX(0deg); }</style></head><body>
+<section class="chart-container">
+  <h1>Averages and Min/Max Over 1 Week <span id="avg-tip" class="tool-tip">Foo</span></h1>
+  <canvas id="chart-averages"></canvas>
+  <div id="legend-averages" class="chart-legend"></div>
+
+  <h1>Multiple SKUs Price Over 180 Mins</h1>
+  <canvas id="chart-skus"></canvas>
+  <div id="legend-skus" class="chart-legend"></div>
+</section>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.js"></script>
+<script src='//static.codepen.io/assets/common/stopExecutionOnTimeout-41c52890748cd7143004e05d3c5f786c66b19939c4500ce446314d1748483e13.js'></script>
+<script >const options = {
+  legend: false,
+  // TODO figure out how to integrate with React/JSX
+  legendCallback: chart => {
+    let legendHTML = [];
+    legendHTML.push('<ul class="chart-legend">');
+    chart.data.datasets.forEach(dataset => {
+      legendHTML.push('<li class="' + dataset.slug + '">');
+      legendHTML.push(dataset.label);
+      legendHTML.push('</li>');
+    });
+    legendHTML.push('</ul>');
+    return legendHTML.join('');
+  },
+  tooltips: {
+    enabled: false,
+    custom: tipModel => {
+      const tipEl = document.getElementById('avg-tip');
+      let tipBody = '';
+      if (tipModel.body) {
+        tipBody = tipModel.dataPoints[0].xLabel;
+        tipBody += ' - ' + tipModel.body[0].lines[0];
+        tipEl.classList.add('active');
+      } else {
+        tipBody = '';
+        tipEl.classList.remove('active');
+      }
+      tipEl.innerText = tipBody;
+    } },
+
+  animation: {
+    duration: 5000 } };
+
+
+let optionsSKUs = Object.assign({}, options);
+optionsSKUs.scales = {
+  yAxes: [{
+    ticks: {
+      suggestedMin: 4000,
+      suggestedMax: 40000 } }] };
+
+
+
+const dataAverages = {
+  labels: ['Nov 3', 'Nov 4', 'Nov 5', 'Nov 6', 'Nov 7', 'Nov 8', 'Nov 9'],
+  // TODO integrate data model - split single array into avg/min/max
+  datasets: [
+  {
+    label: 'Average Bid',
+    data: [12, 15, 7, 5, 9, 3, 8],
+    backgroundColor: 'transparent',
+    borderColor: '#6fb32a',
+    slug: 'average-bid',
+    borderWidth: 2,
+    pointBackgroundColor: '#181818',
+    pointRadius: 7,
+    pointBorderWidth: 3,
+    pointHoverRadius: 10,
+    lineTension: 0 },
+
+  {
+    label: 'Max Bid',
+    data: [16, 16.7, 9, 10, 13, 4.5, 14],
+    backgroundColor: 'transparent',
+    borderColor: 'transparent',
+    slug: 'max-bid',
+    borderWidth: 1,
+    pointBackgroundColor: 'rgba(111, 179, 42, .6)',
+    pointRadius: 7,
+    pointBorderWidth: 3,
+    pointHoverRadius: 9,
+    lineTension: 0 },
+
+  {
+    label: 'Min Bid',
+    data: [10, 6, 4, 3, 6.5, 2, 5],
+    backgroundColor: 'transparent',
+    borderColor: 'transparent',
+    slug: 'min-bid',
+    borderWidth: 1,
+    pointBackgroundColor: 'rgba(111, 179, 42, .3)',
+    pointRadius: 7,
+    pointBorderWidth: 3,
+    pointHoverRadius: 9,
+    lineTension: 0 }] };
+
+
+
+const generateRandoms = () => {
+  let nums = [];
+  for (let i = 0; i <= 180; i++) {if (window.CP.shouldStopExecution(0)) break;
+    nums.push(Math.floor(Math.random() * 20000) + 8000);
+  }window.CP.exitedLoop(0);
+  return nums;
+};
+const generateLabels = () => {
+  let labels = [];
+  for (let i = 0; i <= 180; i++) {if (window.CP.shouldStopExecution(1)) break;
+    labels.push(i);
+  }window.CP.exitedLoop(1);
+  return labels;
+};
+const dataSKUs = {
+  labels: generateLabels(),
+  datasets: [
+  {
+    label: 'SKU 1',
+    data: generateRandoms(),
+    backgroundColor: 'transparent',
+    borderColor: '#6fb32a',
+    slug: 'sku-one',
+    borderWidth: 1,
+    pointBackgroundColor: '#6fb32a',
+    pointRadius: 3,
+    pointBorderWidth: 0,
+    pointHoverRadius: 5,
+    lineTension: 0 },
+
+  {
+    label: 'SKU 2',
+    data: generateRandoms(),
+    backgroundColor: 'transparent',
+    borderColor: 'blue',
+    slug: 'sku-two',
+    borderWidth: 1,
+    pointBackgroundColor: 'blue',
+    pointRadius: 3,
+    pointBorderWidth: 0,
+    pointHoverRadius: 5,
+    lineTension: 0 },
+
+  {
+    label: 'SKU 3',
+    data: generateRandoms(),
+    backgroundColor: 'transparent',
+    borderColor: 'red',
+    slug: 'sku-three',
+    borderWidth: 1,
+    pointBackgroundColor: 'red',
+    pointRadius: 3,
+    pointBorderWidth: 0,
+    pointHoverRadius: 5,
+    lineTension: 0 }]
+
+
+
+
+  // Draw Averages
+};const ctxAvg = document.getElementById('chart-averages');
+const avgChart = new Chart(ctxAvg, {
+  type: 'line',
+  data: dataAverages,
+  options: options });
+
+document.getElementById('legend-averages').innerHTML = avgChart.generateLegend();
+
+// Draw SKUs
+const ctxSKU = document.getElementById('chart-skus');
+const SKUchart = new Chart(ctxSKU, {
+  type: 'line',
+  data: dataSKUs,
+  options: optionsSKUs });
+
+document.getElementById('legend-skus').innerHTML = SKUchart.generateLegend();
+//# sourceURL=pen.js
+</script>
+</body></html>
