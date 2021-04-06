@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html>
+
+<%- include('../partials/header') %>
+
+<body>
+    <%- include('../partials/navbar') %>
+
+    <div class="header">
+        <h2>create project</h2>
+    </div>
+
+    <div class="container">
+        <div class="dashboard">
+            <div class="card" id="card-form">
+                <div class="card-body">
+                    <form method="POST" onsubmit="return validateCreateProject();" id="project-form">
+                        <div class="form-group">
+                            <label for="project-name">project name</label>
+                            <input type="text" name="project-name" class="form-control" id="project-name"
+                                placeholder="project name">
+                            <div id = "error1"></div>
+
+                            <label for="project-description">project description</label>
+                            <textarea rows="5" name="project-description" class="form-control" id="project-description"
+                                placeholder="project description"></textarea>
+                            <div id = "error2"></div>
+
+                            <div class="form-group" id="center">
+                                <button type="submit" class="btn btn-primary" id="project-button">create project</button>
+                            </div>
+                            <%- include('../partials/toast') %>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src = "scripts/frontEndErrorsCreate.js"></script>
+</html>

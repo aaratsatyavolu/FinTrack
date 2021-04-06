@@ -1,0 +1,54 @@
+<!DOCTYPE HTML>
+<html>
+<%- include('../partials/header') %>
+
+<body>
+    
+    <%- include('../partials/navbar') %>
+
+    <div class="header">
+        <h2>register</h2>
+    </div>
+
+    <div class="container">
+        <div class="dashboard">
+            <div class="card" id="card-form">
+                <div class="card-body">
+                    <form method="POST" name = "register-form" onsubmit="return validateRegister();" id="register-form">
+                        <div class="form-group">
+                            <label for="project-name">first name</label>
+                            <input type="text" name="first-name" class="form-control" id="first-name"
+                                placeholder="first name" onkeyup = "checkFName()">
+                            <div id = "error1"></div>
+
+                            <label for="project-name">last name</label>
+                            <input type="text" name="last-name" class="form-control" id="last-name" placeholder="last name" onkeyup = "checkLName()">
+                            <div id = "error2"></div>
+
+                            <label for="project-name">email address</label>
+                            <input type="text" name="email" class="form-control" id="email" placeholder="email address" onkeyup = "checkEmail()">
+                            <div id = "error3"></div>
+
+                            <label for="project-description">password</label>
+                            <input type="password" name="password" class="form-control" id="password"
+                                placeholder="password" onkeyup = "checkPassword()">
+                            <div id = "error4"></div>
+
+                            <label for="project-description">confirm password</label>
+                            <input type="password" name="confirm-password" class="form-control" id="confirm-password"
+                                placeholder="confirm password" onkeyup = "checkConfirmPassword()">
+                            <div id = "error5"></div>
+
+                            <div class="form-group center">
+                                <button type="submit" class="btn btn-primary" id="register-button">confirm</button>
+                            </div>
+                            <%- include('../partials/toast') %>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src = "scripts/frontEndErrorsRegister.js"></script>
+</html>

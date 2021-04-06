@@ -1,0 +1,29 @@
+<!DOCTYPE HTML>
+<html>
+<%- include('../partials/header') %>
+
+<body>
+  <%- include('../partials/navbar') %>
+
+  <div class="header">
+      <button class="fab" onclick="redirect('/create-project')">add new project</button>
+      <h2>project dashboard</h2>
+  </div>
+  <div class="container"> 
+    <div class="dashboard">
+        <% projects.forEach( (project) => { %>
+          <div class="card bg-primary text-black" id="dashboard">
+            <div class="card-body">
+              <%= project.title %>
+              <span class="buttons">
+                  <button class="delete"><img src="./trash.svg"></button>
+                  <button class="edit" onclick="redirect('/edit-project')"><img src="./edit.svg"></button>
+              </span>
+            </div>
+          </div>
+          <% }); %>
+    </div>
+  </div>
+
+</body>
+</html>
